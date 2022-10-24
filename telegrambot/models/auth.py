@@ -18,7 +18,7 @@ AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 @python_2_unicode_compatible
 class AuthToken(models.Model):
     key = models.CharField(max_length=40, primary_key=True)
-    user = models.OneToOneField(AUTH_USER_MODEL, related_name='auth_token',
+    user = models.OneToOneField(AUTH_USER_MODEL, related_name='tele_auth_token',
                                 on_delete=models.CASCADE)
     chat_api = models.OneToOneField(Chat, related_name='auth_token',
                                     on_delete=models.CASCADE, blank=True, null=True)
@@ -26,7 +26,7 @@ class AuthToken(models.Model):
 
     class Meta:
         verbose_name = _('Authentication Token')
-        verbose_name_plural = _('Authentications Tokens')  
+        verbose_name_plural = _('Authentications Tokens')
 
     def save(self, *args, **kwargs):
         if not self.key:
@@ -35,9 +35,9 @@ class AuthToken(models.Model):
 
     def generate_key(self):
         return binascii.hexlify(os.urandom(20)).decode()
-    
+
     def expired(self):
-        
+
         return self.created < now() - timedelta(hours=int(getattr(settings, 'TELEGRAM_BOT_TOKEN_EXPIRATION', '24')))
 
     def __str__(self):
